@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+gem 'awesome_print'
+gem 'haml'
+gem 'optimist'
+gem 'nokogiri'
+gem 'ruby-oci8'
+gem 'sinatra'
