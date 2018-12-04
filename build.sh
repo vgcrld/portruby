@@ -6,6 +6,9 @@ _error() {
   exit 1
 }
 
+# For Oracle OCI8
+export LD_LIBRARY_PATH=/usr/lib/oracle/12.1/client64/lib
+
 # Setup
 cd $(dirname $0)
 _base="$(pwd)"
