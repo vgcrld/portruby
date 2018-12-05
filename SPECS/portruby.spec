@@ -7,7 +7,7 @@
 Name:           portruby
 Version:        1.0
 Release:        2
-Summary:        A test to build an rpm to instal Ruby
+Summary:        Galileo Ruby Base Install
 Group:	        dev
 License:	      MIT
 URL:	          https://galileosuite.com	
@@ -25,16 +25,9 @@ Fully functioning Ruby installed to /opt/galileo/ruby
 export CFLAGS="$RPM_OPT_FLAGS -Wall -fno-strict-aliasing"
 ./configure --disable-install-doc --prefix=%{galileo_ruby}
 make %{?_smp_mflags}
-make install DESTDIR=$RPM_BUILD_ROOT
-export PATH=${RPM_BUILD_ROOT}/%{galileo_ruby}/bin:$PATH
-gem install ${RPM_SOURCE_DIR}/bundler-1.17.1.gem \
-  --no-document \
-  --install-dir ${RPM_BUILD_ROOT}/%{galileo_ruby}/lib/ruby/gems/2.5.0 \
-  --bindir ${RPM_BUILD_ROOT}/%{galileo_ruby}/bin
-bundle install --gemfile ${RPM_SOURCE_DIR}/Gemfile --path ${RPM_BUILD_ROOT}/%{galileo_ruby}/lib/ruby/gems/2.5.0
-cp ${RPM_SOURCE_DIR}/Gemfile ${RPM_BUILD_ROOT}/%{galileo_ruby}
 
 %install
+make install DESTDIR=$RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, 755 )
