@@ -1,7 +1,12 @@
 source 'https://rubygems.org'
+
 gem 'awesome_print'
 gem 'haml'
 gem 'optimist'
 gem 'nokogiri'
 gem 'ruby-oci8'
 gem 'sinatra'
+
+gem 'xxt',     git: 'git@codebox.galileosuite.com:rich.davis/xxt.git',    branch: :develop
+gem 'agem',    git: 'git@codebox.galileosuite.com:rich.davis/agem.git',   branch: :master
+gem 'zippy',   git: 'git@codebox.galileosuite.com:rich.davis/zippy.git',  branch: :master

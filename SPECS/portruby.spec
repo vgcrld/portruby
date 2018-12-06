@@ -47,13 +47,16 @@ cp -r %{_tmppath}/bundle/* ${RPM_BUILD_ROOT}/%{galileo_ruby}
 %post
 export PATH=%{galileo_ruby}/bin:$PATH
 gem install %{galileo_src}/%{bundle_gem}
+mkdir -p %{galileo_ruby}/.bundle
+echo '---'                   >  %{galileo_ruby}/.bundle/config
+echo 'BUNDLE_PATH: "vendor"' >> %{galileo_ruby}/.bundle/config
 
 %files
 %defattr(-, root, root, 755 )
 %{galileo_base}
 
-#%clean 
-#rm -rf %{_tmppath}/bundle
+%clean 
+rm -rf %{_tmppath}/bundle
 
 %changelog
 * Tue Dec 4 2018 Rich Davis <rdavis@galileosuite.com>
