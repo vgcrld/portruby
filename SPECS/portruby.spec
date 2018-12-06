@@ -2,6 +2,8 @@
 
 %define galileo_base  /opt/galileo
 %define galileo_ruby  /opt/galileo/ruby
+%define galileo_src   /opt/galileo/sources
+%define bundle_gem    bundler-1.17.1.gem
 %define rubyver       2.5.3
 %define gemdir        /opt/galileo/ruby/lib/ruby/gems/2.5.0
 
@@ -13,7 +15,6 @@ Group:	        dev
 License:	      MIT
 URL:	          https://galileosuite.com	
 Source0:        ruby-%{rubyver}.tar.gz
-Source1:        bundler-1.17.1.gem
 BuildRequires:  readline-devel ncurses-devel gdbm-devel glibc-devel gcc openssl-devel make libyaml-devel libffi-devel zlib-devel
 Requires:       readline ncurses gdbm glibc openssl libyaml libffi zlib
 
@@ -28,29 +29,31 @@ export CFLAGS="$RPM_OPT_FLAGS -Wall -fno-strict-aliasing"
 ./configure --disable-install-doc --prefix=%{galileo_ruby}
 make %{?_smp_mflags}
 
+# Bundle to tmp and copy to avoid rpm fail on path check
+mkdir -p %{_tmppath}/bundle
+cp ${RPM_SOURCE_DIR}/Gemfile %{_tmppath}/bundle/Gemfile
+rbenv global %{rubyver}
+bundle install --gemfile %{_tmppath}/bundle/Gemfile --path %{_tmppath}/bundle/vendor
+
 %install
-# installing binaries ...
 make install DESTDIR=$RPM_BUILD_ROOT
- 
-# Install the gems in SOURCE
-export PATH=${RPM_BUILD_ROOT}/%{galileo_ruby}/bin:$PATH
-cd ${RPM_SOURCE_DIR}
-gem install bundler-1.17.1.gem    --bindir %{_tmppath}/gems/bin --install-dir %{_tmppath}/gems/lib --no-document --local
-gem install sinatra-2.0.4.gem     --bindir %{_tmppath}/gems/bin --install-dir %{_tmppath}/gems/lib --no-document --local
-gem install nokogiri-1.8.5.gem    --bindir %{_tmppath}/gems/bin --install-dir %{_tmppath}/gems/lib --no-document --local
-gem install ruby-oci8-2.2.6.1.gem --bindir %{_tmppath}/gems/bin --install-dir %{_tmppath}/gems/lib --no-document --local
 
-# gem data 
-cp    %{_tmppath}/gems/bin/* ${RPM_BUILD_ROOT}/%{galileo_ruby}/bin/
-cp -r %{_tmppath}/gems/lib/* ${RPM_BUILD_ROOT}/%{galileo_ruby}/lib/ruby/gems/2.5.0
+# Include bundler source gem and copy bundle created above
+mkdir -p ${RPM_BUILD_ROOT}/%{galileo_ruby}
+mkdir -p ${RPM_BUILD_ROOT}/%{galileo_src}
+cp -r ${RPM_SOURCE_DIR}/%{bundle_gem} ${RPM_BUILD_ROOT}/%{galileo_src}/%{bundle_gem}
+cp -r %{_tmppath}/bundle/* ${RPM_BUILD_ROOT}/%{galileo_ruby}
 
-# Bundle install - copy the 
-## bundle install --gemfile ${RPM_SOURCE_DIR}/Gemfile --path %{_tmppath}/gems/lib/
-## cp -r %{_tmppath}/gems/lib ${RPM_BUILD_ROOT}/%{galileo_ruby}/lib/ruby/gems/2.5.0/
+%post
+export PATH=%{galileo_ruby}/bin:$PATH
+gem install %{galileo_src}/%{bundle_gem}
 
 %files
 %defattr(-, root, root, 755 )
 %{galileo_base}
+
+#%clean 
+#rm -rf %{_tmppath}/bundle
 
 %changelog
 * Tue Dec 4 2018 Rich Davis <rdavis@galileosuite.com>
